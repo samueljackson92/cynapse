@@ -33,12 +33,11 @@ TEST_CASE("MatrixUtils initializeRandomWeights", "[MatrixUtils]") {
 }
 
 TEST_CASE("MatrixUtils applyFunction", "[MatrixUtils]") {
-    Eigen::MatrixXd m = Eigen::Matrix2d::Zero();
-    MatrixXd_ptr mptr = std::make_shared<Eigen::MatrixXd>(m);
+    Eigen::VectorXd v = Eigen::Vector2d::Zero();
 
     SECTION("Test method initialise randomly") {
-        MatrixUtils::applyFunction(mptr, std::function<double(double)>(addOne));
-        REQUIRE(mptr->isZero(0) == false);
-        REQUIRE(mptr->isOnes(0) == true);
+        MatrixUtils::applyFunction(v, std::function<double(double)>(addOne));
+        REQUIRE(v.isZero(0) == false);
+        REQUIRE(v.isOnes(0) == true);
     }
 }

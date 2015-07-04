@@ -28,7 +28,6 @@ TEST_CASE("NeuralNetwork can be initialised", "[NeuralNetwork]") {
 }
 
 TEST_CASE("Testing NeuralNetwork feedForward", "[NeuralNetwork]") {
-    // create a basic layout 2 inputs, 2 nodes in the 1st layer 1 in the 2nd
 
     SECTION("Check feedForward with valid parameters") {
         int nodes[3] = { 2, 2, 1};
@@ -56,4 +55,18 @@ TEST_CASE("Testing NeuralNetwork feedForward", "[NeuralNetwork]") {
         REQUIRE(output[0] == Approx(0.442010));
         REQUIRE(output[1] == Approx(0.464295));
     }
+}
+
+TEST_CASE("Testing NeuralNetwork backPropagate", "[NeuralNetwork]") {
+    // create a basic layout 2 inputs, 2 nodes in the 1st layer 1 in the 2nd
+    int nodes[3] = { 3, 2, 1};
+    std::vector<int> layout(&nodes[0], &nodes[0]+3);
+
+    NeuralNetwork ann(layout, "sigmoid", false);
+
+    Eigen::Vector3d input(1, 1, 1);
+    Eigen::VectorXd actual(1);
+    actual << 1;
+    Eigen::VectorXd output = ann.feedForward(input);
+    ann.backPropagate(output, actual);
 }

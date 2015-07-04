@@ -24,11 +24,11 @@ void MatrixUtils::initializeRandomWeights(MatrixXd_ptr matrix,
     }
 }
 
-void MatrixUtils::applyFunction(MatrixXd_ptr matrix,
+void MatrixUtils::applyFunction(Eigen::VectorXd& vector,
     std::function<double(double)> func) {
-    for (int i=0; i < matrix->cols(); ++i) {
-        for (int j=0; j < matrix->rows(); ++j) {
-            (*matrix)(j, i) = func((*matrix)(j, i));
+    for (int i=0; i < vector.cols(); ++i) {
+        for (int j=0; j < vector.rows(); ++j) {
+            vector(j, i) = func(vector(j, i));
         }
     }
 }
