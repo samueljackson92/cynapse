@@ -22,12 +22,12 @@ double step_activation(double theta) {
 }
 
 NeuralNetwork::NeuralNetwork(const std::vector<int>& layout,
-    const std::string& funcName) : m_layout(layout) {
-    createLayers();
+    const std::string& funcName, const bool randomSeed) : m_layout(layout) {
+    createLayers(randomSeed);
     createActivationFunction(funcName);
 }
 
-void NeuralNetwork::createLayers() {
+void NeuralNetwork::createLayers(const bool randomSeed) {
     // create layers. Ignore the first as this is the size of the input.
     m_layers.reserve(m_layout.size()-1);
     for (int i=1; i < m_layout.size(); ++i) {
@@ -37,7 +37,7 @@ void NeuralNetwork::createLayers() {
         MatrixXd_ptr layer_ptr = std::make_shared<Eigen::MatrixXd>(layer);
         // initialise matrix with random numbers drawn from Gaussian with
         // zero mean and unit variance
-        MatrixUtils::initializeRandomWeights(layer_ptr);
+        MatrixUtils::initializeRandomWeights(layer_ptr, randomSeed);
         m_layers.push_back(layer_ptr);
     }
 }
@@ -48,7 +48,7 @@ void NeuralNetwork::createActivationFunction(const std::string& funcName) {
     } else if (funcName == "step") {
         m_activation_func = std::function<double(double)>(step_activation);
     } else {
-        std::runtime_error("Function " + funcName + " is not supported.");
+        throw std::runtime_error("Function " + funcName + " is not supported.");
     }
 }
 

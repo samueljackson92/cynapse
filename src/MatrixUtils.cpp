@@ -7,9 +7,14 @@
 #include "Types.h"
 #include "MatrixUtils.h"
 
-void MatrixUtils::initializeRandomWeights(MatrixXd_ptr matrix) {
+void MatrixUtils::initializeRandomWeights(MatrixXd_ptr matrix,
+    const bool randomSeed) {
 
-    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    unsigned seed = 0;
+    if (randomSeed) {
+        seed = std::chrono::system_clock::now().time_since_epoch().count();
+    }
+
     std::default_random_engine generator(seed);
     std::normal_distribution<double> distribution(0.0, 1.0);
 
