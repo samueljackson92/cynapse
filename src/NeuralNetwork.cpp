@@ -25,7 +25,7 @@ double sigmoid_prime(double z) {
     return sigmoid_activation(z) * (1-sigmoid_activation(z));
 }
 
-VectorXd cost_derivative(VectorXd output, VectorXd input) {
+MatrixXd cost_derivative(MatrixXd output, MatrixXd input) {
     return output - input;
 }
 
@@ -43,17 +43,17 @@ void NeuralNetwork::createLayers(const bool randomSeed) {
         // size of matrix is defined by the number of nodes (rows) and the
         // size of the output vector from the previous layer (cols)
         Eigen::MatrixXd layer = Eigen::MatrixXd::Zero(m_layout[i], m_layout[i-1]);
-        MatrixXd_ptr layer_ptr = std::make_shared<Eigen::MatrixXd>(layer);
         // initialise matrix with random numbers drawn from Gaussian with
         // zero mean and unit variance
-        MatrixUtils::initializeRandomWeights(layer_ptr, randomSeed);
-        m_layers.push_back(layer_ptr);
+        MatrixUtils::initializeRandomWeights(layer, randomSeed);
+        m_layers.push_back(layer);
     }
 }
 
 void NeuralNetwork::createActivationFunction(const std::string& funcName) {
     if (funcName == "sigmoid") {
         m_activation_func = std::function<double(double)>(sigmoid_activation);
+        m_activation_deriv = std::function<double(double)>(sigmoid_prime);
     } else if (funcName == "step") {
         m_activation_func = std::function<double(double)>(step_activation);
     } else {
@@ -61,61 +61,67 @@ void NeuralNetwork::createActivationFunction(const std::string& funcName) {
     }
 }
 
-VectorXd NeuralNetwork::feedForward(VectorXd input) {
+MatrixXd NeuralNetwork::feedForward(MatrixXd input) {
     m_zVectors.clear();  // Remove cached vectors from previous run
-    m_activations.push_back(std::make_shared<VectorXd>(input));
+    m_activations.push_back(input);
 
-    VectorXd output;
+    MatrixXd output;
 
     for (auto layerIt = m_layers.begin(); layerIt != m_layers.end(); ++layerIt) {
         // compute weighted input for this layer
-        MatrixXd weightMatrix = **layerIt;
-        output = weightMatrix * input;
+        MatrixXd weights = *layerIt;
+        output = weights * input;
         // cache result of weight-input combination for backprop
-        m_zVectors.push_back(std::make_shared<VectorXd>(output));
+        m_zVectors.push_back(output);
         // compute the activation of function from the weighted input
         MatrixUtils::applyFunction(output, m_activation_func);
         // cache activation result of the weight-input combination for backprop
-        m_activations.push_back(std::make_shared<VectorXd>(output));
+        m_activations.push_back(output);
         // set the output as the input for the next layer
         input = output;
     }
 
+    m_activations.pop_back();  // remove last uneeded activation
+
     return output;
 }
 
- std::vector<VectorXd_ptr> NeuralNetwork::backPropagate(VectorXd output, VectorXd actual) {
-    std::vector<VectorXd_ptr> gradients;
-    m_activations.pop_back();
+ void NeuralNetwork::backPropagate(MatrixXd output, MatrixXd actual) {
+    double alpha = 0.001;
 
     if (output.size() != actual.size()) {
         throw std::runtime_error("Output and actual vectors must match in size!");
     }
 
-    auto activation_deriv = std::function<double(double)>(sigmoid_prime);
-
+    MatrixXd weights = m_layers.back();
     // compute error for last layer of network
-    VectorXd cost = cost_derivative(output, actual);
-    VectorXd sigma = m_zVectors.back()->unaryExpr(activation_deriv);
-    m_zVectors.pop_back();
-    VectorXd delta = cost.cwiseProduct(sigma);
+    MatrixXd cost = cost_derivative(output, actual);
+    MatrixXd z = m_zVectors.back();
+    m_zVectors.pop_back();  // remove z vector from cache
 
-    VectorXd gradient = m_activations.back() * delta;
+    MatrixXd sigma = z.unaryExpr(m_activation_deriv);
+    MatrixXd delta = cost.cwiseProduct(sigma);
+
+    MatrixXd gradient = m_activations.back() * delta;
     m_activations.pop_back();
-    gradients.push_back(std::make_shared<VectorXd>(gradient));
+
+    weights = weights - (alpha * gradient).transpose();
 
     // compute error in previous layers of network
     //for each layer:
-    for (int index = m_layers.size()-1; index > 0; --index) {
-        MatrixXd weightMatrix = *m_layers[index];
-        sigma = m_zVectors.back()->unaryExpr(activation_deriv);
+    for (int index = m_layers.size()-2; index > 0; --index) {
+        weights = m_layers[index];
+
+        z = m_zVectors.back();
         m_zVectors.pop_back();
-        delta = (weightMatrix.transpose() * delta).cwiseProduct(sigma);
+
+        sigma = m_zVectors.back().unaryExpr(m_activation_deriv);
+        delta = (weights.transpose() * delta).cwiseProduct(sigma);
 
         gradient = m_activations.back() * delta;
         m_activations.pop_back();
-        gradients.push_back(std::make_shared<VectorXd>(gradient));
-    }
 
-    return gradients;
+        weights = m_layers[index];
+        weights = weights - alpha * gradient;
+    }
 }

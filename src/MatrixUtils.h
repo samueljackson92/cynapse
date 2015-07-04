@@ -9,9 +9,9 @@
 
 class MatrixUtils {
  public:
-    static void initializeRandomWeights(MatrixXd_ptr,
+    static void initializeRandomWeights(Eigen::MatrixXd&,
         const bool randomSeed = true);
-    static void applyFunction(Eigen::VectorXd&, std::function<double(double)>);
+    static void applyFunction(Eigen::MatrixXd&, std::function<double(double)>);
 };
 
 #endif  // MATRIXUTILS_H_

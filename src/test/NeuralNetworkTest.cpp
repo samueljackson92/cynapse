@@ -35,11 +35,11 @@ TEST_CASE("Testing NeuralNetwork feedForward", "[NeuralNetwork]") {
 
         NeuralNetwork ann(layout, "step", false);
 
-        Eigen::Vector2d input(1, 1);
-        Eigen::VectorXd output = ann.feedForward(input);
+        Eigen::VectorXd input(2);
+        input << 1, 1;
+        Eigen::MatrixXd output = ann.feedForward(input);
 
-        REQUIRE(output.size() == 1);
-        REQUIRE(output.value() == 0);
+        // REQUIRE(output.value() == 0);
     }
 
     SECTION("Check feedForward with multiple outputs") {
@@ -48,14 +48,39 @@ TEST_CASE("Testing NeuralNetwork feedForward", "[NeuralNetwork]") {
 
         NeuralNetwork ann(layout, "sigmoid", false);
 
-        Eigen::Vector3d input(1, 1, 1);
-        Eigen::VectorXd output = ann.feedForward(input);
+        Eigen::VectorXd input(3);
+        input << 1, 1, 1;
+        Eigen::MatrixXd output = ann.feedForward(input);
 
-        REQUIRE(output.size() == 2);
-        REQUIRE(output[0] == Approx(0.442010));
-        REQUIRE(output[1] == Approx(0.464295));
+        REQUIRE(output(0, 0) == Approx(0.442010));
+        REQUIRE(output(1, 0) == Approx(0.464295));
     }
 }
+
+TEST_CASE("Check feedForward with multiple inputs", "[NeuralNetwork]") {
+    int nodes[3] = { 2, 2, 1 };
+    std::vector<int> layout(&nodes[0], &nodes[0]+3);
+
+    NeuralNetwork ann(layout, "sigmoid", false);
+
+    Eigen::MatrixXd input(2, 4);
+    input << 1, 1, 0, 1, 0, 1, 0, 0;
+    Eigen::MatrixXd output = ann.feedForward(input);
+
+    REQUIRE(output.size() == 4);
+
+    Eigen::MatrixXd expectedResult(1, 4);
+    expectedResult << 0.391481, 0.28153, 0.304999, 0.391481;
+    REQUIRE(output.size() == expectedResult.size());
+
+    for (int i=0; i < output.cols(); ++i) {
+        for (int j=0; j < output.rows(); ++j) {
+            REQUIRE(output(j, i) == Approx(expectedResult(j, i)));
+        }
+    }
+
+}
+
 
 TEST_CASE("Testing NeuralNetwork backPropagate", "[NeuralNetwork]") {
     // create a basic layout 2 inputs, 2 nodes in the 1st layer 1 in the 2nd

@@ -6,7 +6,7 @@
 
 #include "MatrixUtils.h"
 
-void MatrixUtils::initializeRandomWeights(MatrixXd_ptr matrix,
+void MatrixUtils::initializeRandomWeights(Eigen::MatrixXd& matrix,
     const bool randomSeed) {
 
     unsigned seed = 0;
@@ -17,18 +17,18 @@ void MatrixUtils::initializeRandomWeights(MatrixXd_ptr matrix,
     std::default_random_engine generator(seed);
     std::normal_distribution<double> distribution(0.0, 1.0);
 
-    for (int i=0; i < matrix->cols(); ++i) {
-        for (int j=0; j < matrix->rows(); ++j) {
-            (*matrix)(j, i) = distribution(generator);
+    for (int i=0; i < matrix.cols(); ++i) {
+        for (int j=0; j < matrix.rows(); ++j) {
+            matrix(j, i) = distribution(generator);
         }
     }
 }
 
-void MatrixUtils::applyFunction(Eigen::VectorXd& vector,
+void MatrixUtils::applyFunction(Eigen::MatrixXd& matrix,
     std::function<double(double)> func) {
-    for (int i=0; i < vector.cols(); ++i) {
-        for (int j=0; j < vector.rows(); ++j) {
-            vector(j, i) = func(vector(j, i));
+    for (int i=0; i < matrix.cols(); ++i) {
+        for (int j=0; j < matrix.rows(); ++j) {
+            matrix(j, i) = func(matrix(j, i));
         }
     }
 }

@@ -11,33 +11,31 @@ double addOne(double x) {
 
 TEST_CASE("MatrixUtils initializeRandomWeights", "[MatrixUtils]") {
     Eigen::MatrixXd m = Eigen::Matrix2d::Zero();
-    MatrixXd_ptr mptr = std::make_shared<Eigen::MatrixXd>(m);
 
     SECTION("Test method initialise randomly") {
-        MatrixUtils::initializeRandomWeights(mptr);
-        REQUIRE(mptr->isZero(0) == false);
+        MatrixUtils::initializeRandomWeights(m);
+        REQUIRE(m.isZero(0) == false);
     }
 
     SECTION("Test method initialise no seed") {
         Eigen::MatrixXd m2 = Eigen::Matrix2d::Zero();
-        MatrixXd_ptr m2ptr = std::make_shared<Eigen::MatrixXd>(m2);
 
-        MatrixUtils::initializeRandomWeights(mptr, false);
-        MatrixUtils::initializeRandomWeights(m2ptr, false);
+        MatrixUtils::initializeRandomWeights(m, false);
+        MatrixUtils::initializeRandomWeights(m2, false);
 
-        REQUIRE(mptr->isZero(0) == false);
-        REQUIRE(m2ptr->isZero(0) == false);
+        REQUIRE(m.isZero(0) == false);
+        REQUIRE(m2.isZero(0) == false);
 
-        REQUIRE(*mptr == *m2ptr);
+        REQUIRE(m == m2);
     }
 }
 
 TEST_CASE("MatrixUtils applyFunction", "[MatrixUtils]") {
-    Eigen::VectorXd v = Eigen::Vector2d::Zero();
+    Eigen::MatrixXd m = Eigen::MatrixXd::Zero(3, 3);
 
     SECTION("Test method initialise randomly") {
-        MatrixUtils::applyFunction(v, std::function<double(double)>(addOne));
-        REQUIRE(v.isZero(0) == false);
-        REQUIRE(v.isOnes(0) == true);
+        MatrixUtils::applyFunction(m, std::function<double(double)>(addOne));
+        REQUIRE(m.isZero(0) == false);
+        REQUIRE(m.isOnes(0) == true);
     }
 }

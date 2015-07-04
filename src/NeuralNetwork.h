@@ -1,5 +1,6 @@
 
 #include <Eigen/Dense>
+#include <Eigen/StdVector>
 
 #include <string>
 #include <vector>
@@ -13,15 +14,17 @@ class NeuralNetwork {
  public:
      explicit NeuralNetwork(const std::vector<int>&, const std::string&,
          const bool randomSeed = true);
-     Eigen::VectorXd feedForward(Eigen::VectorXd);
-     std::vector<VectorXd_ptr> backPropagate(Eigen::VectorXd, Eigen::VectorXd);
+     Eigen::MatrixXd feedForward(Eigen::MatrixXd);
+     void backPropagate(Eigen::MatrixXd, Eigen::MatrixXd);
 
  private:
      const std::vector<int> m_layout;
      std::function<double(double)> m_activation_func;
-     std::vector<MatrixXd_ptr > m_layers;
-     std::vector<VectorXd_ptr > m_zVectors;
-     std::vector<VectorXd_ptr > m_activations;
+     std::function<double(double)> m_activation_deriv;
+
+     std::vector<Eigen::MatrixXd> m_layers;
+     std::vector<Eigen::MatrixXd> m_zVectors;
+     std::vector<Eigen::MatrixXd> m_activations;
 
      void createLayers(const bool randomSeed);
      void createActivationFunction(const std::string&);
