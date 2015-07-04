@@ -6,6 +6,9 @@
 
 #include "Types.h"
 
+#ifndef NEURALNETWORK_H_
+#define NEURALNETWORK_H_
+
 class NeuralNetwork {
  public:
      explicit NeuralNetwork(const std::vector<int>&, const std::string&,
@@ -20,3 +23,5 @@ class NeuralNetwork {
      void createLayers(const bool randomSeed);
      void createActivationFunction(const std::string&);
 };
+
+#endif  // NEURALNETWORK_H_
