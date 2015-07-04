@@ -33,7 +33,7 @@ void NeuralNetwork::createLayers(const bool randomSeed) {
     for (int i=1; i < m_layout.size(); ++i) {
         // size of matrix is defined by the number of nodes (rows) and the
         // size of the output vector from the previous layer (cols)
-        Eigen::MatrixXd layer(m_layout[i], m_layout[i-1]);
+        Eigen::MatrixXd layer = Eigen::MatrixXd::Zero(m_layout[i], m_layout[i-1]);
         MatrixXd_ptr layer_ptr = std::make_shared<Eigen::MatrixXd>(layer);
         // initialise matrix with random numbers drawn from Gaussian with
         // zero mean and unit variance

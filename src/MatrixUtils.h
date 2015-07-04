@@ -2,10 +2,16 @@
 #include <Eigen/Dense>
 #include <vector>
 
-class MatrixUtils {
+#include "Types.h"
 
+#ifndef MATRIXUTILS_H_
+#define MATRIXUTILS_H_
+
+class MatrixUtils {
  public:
     static void initializeRandomWeights(MatrixXd_ptr,
         const bool randomSeed = true);
     static void applyFunction(MatrixXd_ptr, std::function<double(double)>);
 };
+
+#endif  // MATRIXUTILS_H_

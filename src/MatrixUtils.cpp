@@ -4,7 +4,6 @@
 #include <random>
 #include <vector>
 
-#include "Types.h"
 #include "MatrixUtils.h"
 
 void MatrixUtils::initializeRandomWeights(MatrixXd_ptr matrix,
