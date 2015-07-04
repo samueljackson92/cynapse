@@ -18,6 +18,8 @@ set(SRC_FILES
 )
 
 set(TEST_FILES
+    ${TEST_DIR}/catch.hpp
+    ${TEST_DIR}/TestsCatchRequire.h
     ${TEST_DIR}/NeuralNetworkTest.cpp
     ${TEST_DIR}/MatrixUtilsTest.cpp
 )
