@@ -29,13 +29,3 @@ TEST_CASE("MatrixUtils initializeRandomWeights", "[MatrixUtils]") {
         REQUIRE(m == m2);
     }
 }
-
-TEST_CASE("MatrixUtils applyFunction", "[MatrixUtils]") {
-    Eigen::MatrixXd m = Eigen::MatrixXd::Zero(3, 3);
-
-    SECTION("Test method initialise randomly") {
-        MatrixUtils::applyFunction(m, std::function<double(double)>(addOne));
-        REQUIRE(m.isZero(0) == false);
-        REQUIRE(m.isOnes(0) == true);
-    }
-}

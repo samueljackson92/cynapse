@@ -11,7 +11,6 @@ class MatrixUtils {
  public:
     static void initializeRandomWeights(Eigen::MatrixXd&,
         const bool randomSeed = true);
-    static void applyFunction(Eigen::MatrixXd&, std::function<double(double)>);
 };
 
 #endif  // MATRIXUTILS_H_

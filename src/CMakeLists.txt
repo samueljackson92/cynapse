@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 3.1)
 project (ANN)
 
+set(CMAKE_BUILD_TYPE Debug)
+
 set(EXEC_NAME ann)
 set(TEST_EXEC_NAME all_tests)
 
