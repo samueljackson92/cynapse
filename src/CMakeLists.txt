@@ -29,6 +29,7 @@ set(TEST_FILES
     ${TEST_DIR}/TestsCatchRequire.h
     ${TEST_DIR}/NeuralNetworkTest.cpp
     ${TEST_DIR}/MatrixUtilsTest.cpp
+    ${TEST_DIR}/FunctionsTest.cpp
 )
 
 add_library(${CYNAPSE_LIBRARY_NAME} SHARED ${INC_FILES} ${SRC_FILES})
