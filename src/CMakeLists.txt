@@ -28,11 +28,6 @@ set(TEST_FILES
 
 add_library(neural_net STATIC ${INCLUDE_FILES} ${SRC_FILES})
 
-add_executable(${EXEC_NAME} main.cpp)
-target_link_libraries(${EXEC_NAME} neural_net)
-
 add_executable(${TEST_EXEC_NAME} ${TEST_FILES})
 target_link_libraries(${TEST_EXEC_NAME} neural_net)
-
-set_property(TARGET ${EXEC_NAME} PROPERTY CXX_STANDARD_REQUIRED 11)
 set_property(TARGET ${TEST_EXEC_NAME} PROPERTY CXX_STANDARD_REQUIRED 11)
