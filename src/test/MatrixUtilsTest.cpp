@@ -1,7 +1,7 @@
 
 #include <Eigen/Dense>
 
-#include "catch.hpp"
+#include "TestsCatchRequire.h"
 #include "../MatrixUtils.h"
 
 // Dummy function for testing applyFunction
