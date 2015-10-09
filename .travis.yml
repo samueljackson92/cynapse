@@ -1,8 +1,15 @@
 language: cpp
 
 compiler:
-  - clang
   - gcc
+
+addons:
+    apt:
+      sources: ['ubuntu-toolchain-r-test']
+      packages: ['g++-4.8']
+
+env: COMPILER=g++-4.8
+
 
 before_install:
     - sudo apt-get install libeigen3-dev
@@ -17,4 +24,4 @@ install:
     - mkdir build
     - cd build
     - cmake ../src
-    - make
+    - make CXX=$COMPILER -j3
