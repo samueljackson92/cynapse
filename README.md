@@ -1,0 +1,2 @@
+# cynapse
+C++ neural network
