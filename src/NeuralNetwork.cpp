@@ -120,7 +120,6 @@ std::vector<MatrixXd> NeuralNetwork::backPropagate(MatrixXd output,
     }
 
     std::vector<MatrixXd> errors;
-    int last_index = m_weights.size()-1;
 
     // compute error for last layer of network
     MatrixXd cost = cost_derivative(output, actual);
