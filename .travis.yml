@@ -1,5 +1,5 @@
 before_install:
-    - sudo apt-get install eigen3
+    - sudo apt-get install libeigen3-dev
 
 install: make
 language: cpp
