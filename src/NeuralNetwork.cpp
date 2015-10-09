@@ -8,28 +8,13 @@
 #include <utility>
 #include <vector>
 
+#include "Functions.hpp"
 #include "Types.h"
 #include "NeuralNetwork.h"
 #include "MatrixUtils.h"
 
 using Eigen::VectorXd;
 using Eigen::MatrixXd;
-
-double sigmoid_activation(double theta) {
-    return 1.0 / (1.0 + exp(-theta));
-}
-
-double step_activation(double theta) {
-    return (theta >= 0.5 ? 1.0 : 0.0);
-}
-
-double sigmoid_prime(double z) {
-    return sigmoid_activation(z) * (1-sigmoid_activation(z));
-}
-
-MatrixXd cost_derivative(MatrixXd output, MatrixXd input) {
-    return output - input;
-}
 
 NeuralNetwork::NeuralNetwork(const std::vector<int>& layout,
     const std::string& funcName, const bool randomSeed) : m_layout(layout) {
@@ -55,10 +40,10 @@ void NeuralNetwork::createLayers(const bool randomSeed) {
 
 void NeuralNetwork::createActivationFunction(const std::string& funcName) {
     if (funcName == "sigmoid") {
-        m_activation_func = std::function<double(double)>(sigmoid_activation);
-        m_activation_deriv = std::function<double(double)>(sigmoid_prime);
+        m_activation_func = std::function<double(double)>(sigmoid);
+        m_activation_deriv = std::function<double(double)>(sigmoid_derivative);
     } else if (funcName == "step") {
-        m_activation_func = std::function<double(double)>(step_activation);
+        m_activation_func = std::function<double(double)>(heaviside);
     } else {
         throw std::runtime_error("Function " + funcName + " is not supported.");
     }
@@ -122,7 +107,7 @@ std::vector<MatrixXd> NeuralNetwork::backPropagate(MatrixXd output,
     std::vector<MatrixXd> errors;
 
     // compute error for last layer of network
-    MatrixXd cost = cost_derivative(output, actual);
+    MatrixXd cost = quadratic_cost_derivative(output, actual);
     MatrixXd sigmaPrime = getSigmaPrime();
     MatrixXd a = getActivation();
 

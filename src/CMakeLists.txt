@@ -13,6 +13,7 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 link_directories(${EIGEN3_LIBRARIES})
 
 set(INC_FILES
+    Functions.hpp
     NeuralNetwork.h
     MatrixUtils.h
     Types.h
