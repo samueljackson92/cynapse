@@ -1,11 +1,9 @@
 before_install:
     - sudo apt-get install libeigen3-dev
+    - mkdir build
+    - cd build
+    - cmake ../src
 
-before_script:
-  - mkdir build
-  - cd build
-  - cmake ..
- 
 install: make
 language: cpp
 compiler:
