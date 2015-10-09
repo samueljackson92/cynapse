@@ -24,3 +24,6 @@ install:
     - cmake ../src
     - export CXX=$COMPILER
     - make
+
+script:
+    - make test
