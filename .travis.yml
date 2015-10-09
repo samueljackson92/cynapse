@@ -6,6 +6,10 @@ compiler:
 
 before_install:
     - sudo apt-get install libeigen3-dev
+    - sudo add-apt-repository -y ppa:george-edison55/precise-backports
+    - sudo apt-get update
+    - sudo apt-get install cmake-data
+    - sudo apt-get install cmake
     - if [ "$CXX" == "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
     - if [ "$CXX" == "clang++" ]; then export CXX="clang++-3.4"; fi
 
@@ -14,16 +18,3 @@ install:
     - cd build
     - cmake ../src
     - make
-
-addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    - h-rayflood-llvm
-    - george-edison55/precise-backports
-    packages:
-    - gcc-4.8
-    - g++-4.8
-    - clang++-3.4
-    - cmake-data
-    - cmake
