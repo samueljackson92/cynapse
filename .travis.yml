@@ -1,4 +1,7 @@
-install: make eigen3
+before_install:
+    - sudo apt-get install eigen3
+
+install: make
 language: cpp
 compiler:
   - clang
