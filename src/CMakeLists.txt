@@ -3,8 +3,6 @@ project(Cynapse)
 
 set(CMAKE_BUILD_TYPE Debug)
 set(CYNAPSE_LIBRARY_NAME cynapse)
-set(TEST_EXEC_NAME all_tests)
-set(TEST_DIR test)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/../cmake)
 
@@ -23,19 +21,12 @@ set(SRC_FILES
     MatrixUtils.cpp
 )
 
-set(TEST_FILES
-    ${TEST_DIR}/catch.hpp
-    ${TEST_DIR}/TestsCatchRequire.h
-    ${TEST_DIR}/NeuralNetworkTest.cpp
-    ${TEST_DIR}/MatrixUtilsTest.cpp
-)
-
+# Build the Cynapse library
 add_library(${CYNAPSE_LIBRARY_NAME} STATIC ${INCLUDE_FILES} ${SRC_FILES})
 target_link_libraries(${CYNAPSE_LIBRARY_NAME} ${EIGEN3_LIBRARIES})
 set_property(TARGET ${CYNAPSE_LIBRARY_NAME} PROPERTY CXX_STANDARD 11)
 set_property(TARGET ${CYNAPSE_LIBRARY_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
 
-add_executable(${TEST_EXEC_NAME} ${TEST_FILES})
-target_link_libraries(${TEST_EXEC_NAME} ${CYNAPSE_LIBRARY_NAME} ${EIGEN3_LIBRARIES})
-set_property(TARGET ${TEST_EXEC_NAME} PROPERTY CXX_STANDARD 11)
-set_property(TARGET ${TEST_EXEC_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
+# Build the tests
+enable_testing()
+add_subdirectory(test)
