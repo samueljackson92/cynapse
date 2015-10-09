@@ -1,6 +1,8 @@
 before_install:
     - sudo apt-get install libeigen3-dev
-    - sudo apt-get upgrade
+    - sudo add-apt-repository ppa:george-edison55/precise-backports --yes
+    - sudo apt-get update
+    - sudo apt-get install cmake
     - mkdir build
     - cd build
     - cmake ../src
