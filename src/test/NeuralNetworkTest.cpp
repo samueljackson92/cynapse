@@ -86,8 +86,8 @@ TEST_CASE("Testing NeuralNetwork feedForward", "[NeuralNetwork]") {
         Eigen::MatrixXd output = ann.feedForward(input);
         REQUIRE(output.size() == 4);
 
-        Eigen::MatrixXd expectedResult(4, 1);
-        expectedResult << 0.35023, 0.36363, 0.32317, 0.30499;
+        Eigen::MatrixXd expectedResult(1, 4);
+        expectedResult << 0.36363, 0.323174, 0.350235, 0.30499;
         REQUIRE(output.size() == expectedResult.size());
 
         for (int i=0; i < output.cols(); ++i) {
@@ -135,13 +135,13 @@ TEST_CASE("Testing NeuralNetwork backPropagate", "[NeuralNetwork]") {
         
         Eigen::MatrixXd output = ann.feedForward(input);
 
-        REQUIRE(output.cols() == 2);
-        REQUIRE(output.rows() == 1);
+        REQUIRE(output.cols() == 1);
+        REQUIRE(output.rows() == 2);
 
         REQUIRE(output(0, 0) == Approx(0.276810));
-        REQUIRE(output(0, 1) == Approx(0.757047));
+        REQUIRE(output(1, 0) == Approx(0.757047));
 
-        Eigen::RowVectorXd actual(2);
+        Eigen::MatrixXd actual(2, 1);
         actual << 1, 1;
 
         REQUIRE_NOTHROW(ann.backPropagate(output, actual));
@@ -160,10 +160,10 @@ TEST_CASE("Testing NeuralNetwork multiple inputs", "[NeuralNetwork]") {
              1, 0, 0;
 
     Eigen::MatrixXd output = ann.feedForward(input);
-    REQUIRE(output.cols() == 1);
-    REQUIRE(output.rows() == 4);
+    REQUIRE(output.cols() == 4);
+    REQUIRE(output.rows() == 1);
 
-    Eigen::MatrixXd expectedResult(4, 1);
+    Eigen::MatrixXd expectedResult(1, 4);
     expectedResult << 0.39573, 0.64993, 0.29571, 0.48559;
 
     REQUIRE(output.cols() == expectedResult.cols());
@@ -175,7 +175,7 @@ TEST_CASE("Testing NeuralNetwork multiple inputs", "[NeuralNetwork]") {
         }
     }
 
-    Eigen::MatrixXd actual(4, 1);
+    Eigen::MatrixXd actual(1, 4);
     actual << 0, 1, 1, 0;
 
     REQUIRE_NOTHROW(ann.backPropagate(output, actual));
