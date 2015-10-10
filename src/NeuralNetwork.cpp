@@ -57,7 +57,7 @@ void NeuralNetwork::train(MatrixXd input, MatrixXd expected,
 
         if (i % 100 == 0) {
             std::cout << "Epoch " << i << ": "
-                      << output.transpose() << std::endl;
+                      << output << std::endl;
         }
     }
 
@@ -74,7 +74,7 @@ MatrixXd NeuralNetwork::feedForward(MatrixXd input) {
     for (int index=0; index < m_layout.size()-1; ++index) {
         // compute weighted input for this layer
         MatrixXd weights = m_weights[index];
-        MatrixXd z = weights.transpose() * activation;
+        MatrixXd z = activation * weights;
         // cache result of weight-input combination for backprop
         m_zVectors.push_back(z);
         // compute the activation of function from the weighted input
@@ -109,7 +109,7 @@ std::vector<MatrixXd> NeuralNetwork::backPropagate(MatrixXd output,
     MatrixXd a = getActivation();
 
     MatrixXd delta = cost.transpose().cwiseProduct(sigmaPrime);
-    MatrixXd wError = delta * a.transpose();
+    MatrixXd wError = delta.transpose() * a;
 
     errors.push_back(wError);
 
@@ -119,8 +119,8 @@ std::vector<MatrixXd> NeuralNetwork::backPropagate(MatrixXd output,
         sigmaPrime = getSigmaPrime();
         a = getActivation();
 
-        delta = (weights * delta).cwiseProduct(sigmaPrime);
-        wError = delta * a.transpose();
+        delta = (weights * delta.transpose()).cwiseProduct(sigmaPrime.transpose());
+        wError = delta * a;
 
         errors.push_back(wError);
     }
