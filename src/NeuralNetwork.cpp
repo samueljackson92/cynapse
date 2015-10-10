@@ -41,14 +41,9 @@ void NeuralNetwork::createLayers(const bool randomSeed) {
 }
 
 void NeuralNetwork::createActivationFunction(const std::string& funcName) {
-    if (funcName == "sigmoid") {
-        m_activation_func = std::function<double(double)>(sigmoid);
-        m_activation_deriv = std::function<double(double)>(sigmoid_derivative);
-    } else if (funcName == "step") {
-        m_activation_func = std::function<double(double)>(heaviside);
-    } else {
-        throw std::runtime_error("Function " + funcName + " is not supported.");
-    }
+    auto functions = FunctionFactory::create(funcName);
+    m_activation_func = functions.first;
+    m_activation_deriv = functions.second;
 }
 
 void NeuralNetwork::train(MatrixXd input, MatrixXd expected,

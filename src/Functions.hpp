@@ -25,4 +25,30 @@ Eigen::MatrixXd quadratic_cost_derivative(Eigen::MatrixXd output, Eigen::MatrixX
     return output - input;
 }
 
+class FunctionFactory
+{
+public:
+    static std::pair<std::function<double(double)>, std::function<double(double)> >
+        create(const std::string& funcName) {
+        
+        std::function<double(double)> activation_func;
+        std::function<double(double)> activation_deriv;
+        
+        if (funcName == "sigmoid") {
+            activation_func = std::function<double(double)>(sigmoid);
+            activation_deriv = std::function<double(double)>(sigmoid_derivative);
+        }
+        else if (funcName == "step")
+        {
+            activation_func = std::function<double(double)>(heaviside);
+        }
+        else
+        {
+            throw std::runtime_error("Function " + funcName + " is not supported.");
+        }
+            
+        return std::pair<std::function<double(double)>, std::function<double(double)> >(activation_func, activation_deriv);
+    }
+};
+
 #endif
