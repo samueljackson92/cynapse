@@ -1,4 +1,3 @@
-
 set(TEST_INCLUDES
     catch.hpp
     TestsCatchRequire.h

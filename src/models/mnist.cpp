@@ -5,6 +5,7 @@
 #include "mnist.h"
 
 #include <stdio.h>
+#include "../core/NeuralNetwork.h"
 
 using namespace cv;
 

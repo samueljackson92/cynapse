@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "TestsCatchRequire.h"
-#include "../NeuralNetwork.h"
+#include "../core/NeuralNetwork.h"
 
 TEST_CASE("NeuralNetwork can be initialised", "[NeuralNetwork]") {
     // create a basic layout 2 inputs, 2 nodes in the 1st layer 1 in the 2nd

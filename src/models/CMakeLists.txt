@@ -1,4 +1,3 @@
-
 find_package( OpenCV REQUIRED )
 add_executable(mnist mnist.cpp mnist.h)
 target_link_libraries(mnist ${OpenCV_LIBS} ${CYNAPSE_LIBRARY_NAME} ${EIGEN3_LIBRARIES})

@@ -56,7 +56,7 @@ void NeuralNetwork::train(MatrixXd input, MatrixXd expected,
         updateWeights(errors, alpha);
 
         if (i % 100 == 0) {
-            std::cout << "Epoch " << i << ": "
+            std::cout << "Epoch " << i << ": " << std::endl
                       << output << std::endl;
         }
     }
