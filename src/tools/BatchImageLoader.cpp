@@ -6,8 +6,8 @@
 namespace fs = boost::filesystem;
 using namespace std;
 
-BatchImageLoader::BatchImageLoader(const string& directoryName, const int batchSize)
-    : m_batchSize(batchSize) {
+BatchImageLoader::BatchImageLoader(const string& directoryName, const int batchSize, const string& extension)
+    : m_batchSize(batchSize), m_extension(extension) {
     m_filenames.reserve(m_batchSize);
 
     const fs::path directory(directoryName);
@@ -31,7 +31,7 @@ Eigen::MatrixXd BatchImageLoader::next() {
             throw std::runtime_error(path.string() + " is not a valid path.");
         }
 
-        if (path.extension().string() != ".jpg") {
+        if (path.extension().string() != m_extension) {
             --i;
             continue;
         }

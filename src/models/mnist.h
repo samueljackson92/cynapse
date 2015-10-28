@@ -7,4 +7,7 @@
 
 #include <Eigen/Dense>
 
+size_t labelFromFilename(const std::string& filename);
+Eigen::MatrixXd convertFilenamesToLabels(const std::vector<std::string>& filenames);
+
 #endif //CYNAPSE_MNIST_CPP_H
