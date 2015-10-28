@@ -31,3 +31,4 @@ set_property(TARGET ${CYNAPSE_LIBRARY_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
 # Build the tests
 enable_testing()
 add_subdirectory(test)
+add_subdirectory(models)
