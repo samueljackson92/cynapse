@@ -2,45 +2,58 @@
 // Created by Samuel Jackson on 28/10/2015.
 //
 
+
+#include <boost/lexical_cast.hpp>
+
+#include <iostream>
+#include <string>
+#include <vector>
+
 #include "mnist.h"
-
-#include <stdio.h>
 #include "../core/NeuralNetwork.h"
+#include "../tools/BatchImageLoader.h"
 
-using namespace cv;
+const size_t BATCH_SIZE = 5;
+
+
+size_t labelFromFilename(const std::string& filename) {
+    size_t index = filename.find_last_of("_");
+    return boost::lexical_cast<int>(filename.substr(index+1, 1));
+}
+
+Eigen::MatrixXd convertFilenamesToLabels(const std::vector<std::string>& filenames) {
+    Eigen::MatrixXd mat(10, filenames.size());
+    int i = 0;
+
+    for (auto it = filenames.cbegin(); it != filenames.cend(); ++i, ++it) {
+        size_t label = labelFromFilename(*it);
+        Eigen::VectorXd v = Eigen::VectorXd::Zero(10);
+        v(label) = 1;
+        mat.col(i) = v;
+    }
+
+    return mat;
+}
+
 
 int main(int argc, char** argv )
 {
-	Mat image = imread(argv[1], CV_LOAD_IMAGE_GRAYSCALE);
-	Eigen::VectorXd vec = convert_image_to_vector(image);
+    BatchImageLoader loader(argv[1], BATCH_SIZE);
+    Eigen::MatrixXd examples = loader.next();
+    std::vector<std::string> filenames = loader.getFilenames();
 
-	int nodes[3] = { (int) vec.size(), 50, 10 };
-	std::vector<int> layout(&nodes[0], &nodes[0]+3);
+    Eigen::MatrixXd labels = convertFilenamesToLabels(filenames);
+    std::cout << labels << std::endl;
 
-	NeuralNetwork ann(layout, "sigmoid", false);
+    int nodes[3] = { static_cast<int>(examples.cols()), 50, 10 };
+    std::vector<int> layout(&nodes[0], &nodes[0]+3);
 
-	Eigen::MatrixXd example(1, vec.size());
-	example << vec.transpose();
-	
-	Eigen::MatrixXd output(10, 1);
-	output << 0, 1, 0, 0, 0, 0, 0, 0, 0, 0;
+    NeuralNetwork ann(layout, "sigmoid", false);
+    ann.train(examples, labels, 500, 1.0);
 
-	ann.train(example, output, 500, 100.0);
-
-	output = ann.feedForward(example);
-
-	std::cout << "========= Final Weights ========" << std::endl;
-	std::cout << output << std::endl;
-	return 0;
+    // Eigen::MatrixXd output = ann.feedForward(examples.col(0));
+    //
+    // std::cout << "========= Final Weights ========" << std::endl;
+    // std::cout << output << std::endl;
+    return 0;
 }
-
-Eigen::VectorXd convert_image_to_vector(Mat image)
-{
-	Eigen::MatrixXd matrix;
-	cv2eigen(image, matrix);
-	int size = matrix.cols()*matrix.rows();
-	Eigen::VectorXd v(Eigen::Map<Eigen::VectorXd>(matrix.data(), size));
-	return v;
-}
-
-

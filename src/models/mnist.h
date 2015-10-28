@@ -6,9 +6,5 @@
 #define CYNAPSE_MNIST_CPP_H
 
 #include <Eigen/Dense>
-#include <opencv2/core/eigen.hpp>
-#include <opencv2/opencv.hpp>
-
-Eigen::VectorXd convert_image_to_vector(cv::Mat image);
 
 #endif //CYNAPSE_MNIST_CPP_H

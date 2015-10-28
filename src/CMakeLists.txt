@@ -3,6 +3,7 @@ project(Cynapse)
 
 set(CMAKE_BUILD_TYPE Debug)
 set(CYNAPSE_LIBRARY_NAME cynapse)
+set(CYNAPSE_TOOLS_LIBRARY_NAME cynapse_tools)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/../cmake)
 
@@ -12,6 +13,6 @@ link_directories(${EIGEN3_LIBRARIES})
 
 enable_testing()
 add_subdirectory(core)
+add_subdirectory(tools)
 add_subdirectory(models)
 add_subdirectory(test)
-
