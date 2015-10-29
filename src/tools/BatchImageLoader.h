@@ -19,6 +19,9 @@ class BatchImageLoader
         std::vector<std::string> getFilenames() const { return m_filenames; }
 
     private:
+        void nextFilenameBatch();
+        std::vector<Eigen::VectorXd> loadImages(const std::vector<std::string>& filenames);
+        Eigen::MatrixXd stackVectorsRowwise(const std::vector<Eigen::VectorXd>& vectors);
         Eigen::VectorXd loadImage(const std::string& path);
         Eigen::VectorXd convertImageToVector(const cv::Mat& image);
 

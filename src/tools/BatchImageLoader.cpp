@@ -5,6 +5,7 @@
 
 namespace fs = boost::filesystem;
 using namespace std;
+using namespace Eigen;
 
 BatchImageLoader::BatchImageLoader(const string& directoryName, const int batchSize, const string& extension)
     : m_batchSize(batchSize), m_extension(extension) {
@@ -19,10 +20,14 @@ BatchImageLoader::BatchImageLoader(const string& directoryName, const int batchS
     }
 }
 
-Eigen::MatrixXd BatchImageLoader::next() {
+MatrixXd BatchImageLoader::next() {
+    nextFilenameBatch();
+    auto images = loadImages(m_filenames);
+    return stackVectorsRowwise(images);
+}
+
+void BatchImageLoader::nextFilenameBatch() {
     m_filenames.clear();
-    vector<Eigen::VectorXd> images;
-    images.reserve(m_batchSize);
 
     for (int i = 0; i < m_batchSize && m_directoryIter != m_endIter; ++i, ++m_directoryIter) {
         auto path = m_directoryIter->path();
@@ -36,31 +41,45 @@ Eigen::MatrixXd BatchImageLoader::next() {
             continue;
         }
 
-        Eigen::VectorXd img = loadImage(path.string());
-        images.push_back(img);
         m_filenames.push_back(path.string());
     }
-
-    Eigen::MatrixXd mat(m_batchSize, 784);
-    vector<Eigen::VectorXd>::const_iterator imgIter = images.begin();
-
-    for (int i=0; i < m_batchSize && imgIter != images.end(); ++i, ++imgIter) {
-        mat.row(i) = *imgIter;
-    }
-
-    return mat;
 }
 
-Eigen::VectorXd BatchImageLoader::loadImage(const string& path) {
+vector<VectorXd> BatchImageLoader::loadImages(const vector<string>& filenames) {
+    vector<VectorXd> images;
+    images.reserve(m_batchSize);
+
+    for(auto fileIter = m_filenames.cbegin(); fileIter != m_filenames.cend(); ++fileIter) {
+        VectorXd img = loadImage(*fileIter);
+        images.push_back(img);
+    }
+
+    return images;
+}
+
+MatrixXd BatchImageLoader::stackVectorsRowwise(const std::vector<VectorXd>& vectors) {
+    vector<VectorXd>::const_iterator imgIter = vectors.begin();
+    if (imgIter != vectors.end()) {
+        MatrixXd mat(m_batchSize, vectors[0].size());
+        for (int i = 0; i < m_batchSize && imgIter != vectors.end(); ++i, ++imgIter) {
+            mat.row(i) = *imgIter;
+        }
+        return mat;
+    } else {
+        return MatrixXd::Zero(m_batchSize, 0);
+    }
+}
+
+VectorXd BatchImageLoader::loadImage(const string& path) {
     cv::Mat image = cv::imread(path, CV_LOAD_IMAGE_GRAYSCALE);
     return convertImageToVector(image);
 }
 
 
-Eigen::VectorXd BatchImageLoader::convertImageToVector(const cv::Mat& image) {
-    Eigen::MatrixXd matrix;
+VectorXd BatchImageLoader::convertImageToVector(const cv::Mat& image) {
+    MatrixXd matrix;
     cv::cv2eigen(image, matrix);
     int size = matrix.cols()*matrix.rows();
-    Eigen::VectorXd v(Eigen::Map<Eigen::VectorXd>(matrix.data(), size));
+    VectorXd v(Map<VectorXd>(matrix.data(), size));
     return v;
 }
