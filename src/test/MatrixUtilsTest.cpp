@@ -2,7 +2,7 @@
 #include <Eigen/Dense>
 
 #include "TestsCatchRequire.h"
-#include "../MatrixUtils.h"
+#include "../core/MatrixUtils.h"
 
 // Dummy function for testing applyFunction
 double addOne(double x) {

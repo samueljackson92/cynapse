@@ -49,6 +49,9 @@ void NeuralNetwork::createActivationFunction(const std::string& funcName) {
 void NeuralNetwork::train(MatrixXd input, MatrixXd expected,
     int maxIter, double alpha) {
 
+    //weight learning rate by number of examples in batch
+    alpha *= (1.0/input.rows());
+
     for (int i=0; i <= maxIter; ++i) {
 
         MatrixXd output = feedForward(input);
@@ -56,8 +59,7 @@ void NeuralNetwork::train(MatrixXd input, MatrixXd expected,
         updateWeights(errors, alpha);
 
         if (i % 100 == 0) {
-            std::cout << "Epoch " << i << ": "
-                      << output << std::endl;
+            std::cout << "Epoch " << i << std::endl;
         }
     }
 
@@ -105,6 +107,7 @@ std::vector<MatrixXd> NeuralNetwork::backPropagate(MatrixXd output,
 
     // compute error for last layer of network
     MatrixXd cost = quadratic_cost_derivative(output, actual);
+
     MatrixXd sigmaPrime = getSigmaPrime();
     MatrixXd a = getActivation();
 
@@ -127,7 +130,7 @@ std::vector<MatrixXd> NeuralNetwork::backPropagate(MatrixXd output,
 
     std::reverse(errors.begin(), errors.end());
 
-    return std::vector<MatrixXd>(errors);
+    return errors;
 }
 
 void NeuralNetwork::updateWeights(const std::vector<Eigen::MatrixXd>& errors,
