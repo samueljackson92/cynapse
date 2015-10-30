@@ -5,9 +5,8 @@
 #ifndef CYNAPSE_MNIST_CPP_H
 #define CYNAPSE_MNIST_CPP_H
 
-#include <Eigen/Dense>
+#include "../core/NeuralNetwork.h"
 
-size_t labelFromFilename(const std::string& filename);
-Eigen::MatrixXd convertFilenamesToLabels(const std::vector<std::string>& filenames);
+NeuralNetwork createNetwork();
 
 #endif //CYNAPSE_MNIST_CPP_H
