@@ -196,11 +196,11 @@ TEST_CASE("Testing NeuralNetwork training", "[NeuralNetwork]") {
     Eigen::MatrixXd actual(1, 4);
     actual << 0, 1, 1, 0;
 
-    REQUIRE_NOTHROW(ann.train(input, actual, 5000, 0.1));
+    REQUIRE_NOTHROW(ann.train(input, actual, 5000, 1));
 
     Eigen::MatrixXd example(1, 3);
     example << 1, 0, 0;
 
     Eigen::MatrixXd output = ann.feedForward(example);
-    REQUIRE(output.value() == Approx(0.064165));
+    REQUIRE(output.value() == Approx(0.0328009245));
 }
