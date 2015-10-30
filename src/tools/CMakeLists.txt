@@ -1,11 +1,11 @@
 set(INC_FILES
     BatchImageLoader.h
-    DatasetDescriptor.h
+    BatchDatasetDescriptor.h
 )
 
 set(SRC_FILES
     BatchImageLoader.cpp
-    DatasetDescriptor.cpp
+    BatchDatasetDescriptor.cpp
 )
 
 find_package( OpenCV REQUIRED )

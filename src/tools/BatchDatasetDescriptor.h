@@ -9,11 +9,11 @@
 #include <vector>
 #include <fstream>
 
-class DatasetDescriptor {
+class BatchDatasetDescriptor {
 public:
-    DatasetDescriptor(const std::string& filename, const int batchSize);
+    BatchDatasetDescriptor(const std::string& filename, const int batchSize);
 
-    virtual ~DatasetDescriptor() { }
+    virtual ~BatchDatasetDescriptor() { m_file.close(); }
 
     const std::vector<std::string>& getFilenames() const {
         return m_filenames;
@@ -23,7 +23,12 @@ public:
         return m_labels;
     }
 
+    const int getBatchSize() const {
+        return m_batchSize;
+    }
+
     void next();
+    bool hasNext();
 
 private:
     std::ifstream openFileStream(const std::string& filename);
@@ -32,6 +37,7 @@ private:
     void readCSVFile();
     void readCSVRow();
 
+private:
     const int m_batchSize;
     std::ifstream m_file;
     std::vector<std::string> m_filenames;

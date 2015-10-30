@@ -7,66 +7,76 @@ namespace fs = boost::filesystem;
 using namespace std;
 using namespace Eigen;
 
-BatchImageLoader::BatchImageLoader(const string& directoryName, const int batchSize, const string& extension)
-    : m_batchSize(batchSize), m_extension(extension) {
-    m_filenames.reserve(m_batchSize);
+const size_t MAX_PIXEL_VALUE = 255;
+const string DATASET_CSV_NAME  = "/dataset.csv";
+
+BatchImageLoader::BatchImageLoader(const string& directoryName, const int batchSize, const int numClasses)
+    : m_numClasses(numClasses), m_directory(directoryName),
+      m_descriptor(directoryName + DATASET_CSV_NAME, batchSize) {
 
     const fs::path directory(directoryName);
-    if (fs::exists(directory) && fs::is_directory(directory)) {
-        fs::directory_iterator dir_iter(directory);
-        m_directoryIter = dir_iter;
-    } else {
+    if (!fs::exists(directory) || !fs::is_directory(directory)) {
         throw std::runtime_error(directoryName + " is not a directory");
     }
 }
 
-MatrixXd BatchImageLoader::next() {
-    nextFilenameBatch();
-    auto images = loadImages(m_filenames);
-    return stackVectorsRowwise(images);
+void BatchImageLoader::next() {
+    m_descriptor.next();
 }
 
-void BatchImageLoader::nextFilenameBatch() {
-    m_filenames.clear();
+MatrixXd BatchImageLoader::loadImages() {
+    const int batchSize = m_descriptor.getBatchSize();
+    auto filenames = m_descriptor.getFilenames();
 
-    for (int i = 0; i < m_batchSize && m_directoryIter != m_endIter; ++i, ++m_directoryIter) {
-        auto path = m_directoryIter->path();
-
-        if (!fs::is_regular_file(m_directoryIter->status())) {
-            throw std::runtime_error(path.string() + " is not a valid path.");
-        }
-
-        if (path.extension().string() != m_extension) {
-            --i;
-            continue;
-        }
-
-        m_filenames.push_back(path.string());
-    }
-}
-
-vector<VectorXd> BatchImageLoader::loadImages(const vector<string>& filenames) {
     vector<VectorXd> images;
-    images.reserve(m_batchSize);
+    images.reserve(batchSize);
 
-    for(auto fileIter = m_filenames.cbegin(); fileIter != m_filenames.cend(); ++fileIter) {
-        VectorXd img = loadImage(*fileIter);
+    for(auto fileIter = filenames.cbegin(); fileIter != filenames.cend(); ++fileIter) {
+        fs::path full_path = m_directory / fs::path(*fileIter);
+        VectorXd img = loadImage(full_path.string());
         images.push_back(img);
     }
 
-    return images;
+    return stackVectorsRowwise(images);
+}
+
+Eigen::MatrixXd BatchImageLoader::loadLabels() {
+    const int batchSize = m_descriptor.getBatchSize();
+    auto labels = m_descriptor.getLabels();
+
+    Eigen::MatrixXd mat(m_numClasses, labels.size());
+
+    size_t i = 0;
+    for (auto it = labels.cbegin(); it != labels.cend(); ++it, ++i) {
+        int label = *it;
+        Eigen::VectorXd v = Eigen::VectorXd::Zero(mat.rows());
+        v(label) = 1;
+        mat.col(i) = v;
+    }
+
+    return mat;
 }
 
 MatrixXd BatchImageLoader::stackVectorsRowwise(const std::vector<VectorXd>& vectors) {
+    int batchSize = m_descriptor.getBatchSize();
     vector<VectorXd>::const_iterator imgIter = vectors.begin();
+
     if (imgIter != vectors.end()) {
-        MatrixXd mat(m_batchSize, vectors[0].size());
-        for (int i = 0; i < m_batchSize && imgIter != vectors.end(); ++i, ++imgIter) {
+        MatrixXd mat(batchSize, vectors[0].size());
+        for (int i = 0; i < batchSize && imgIter != vectors.end(); ++i, ++imgIter) {
             mat.row(i) = *imgIter;
         }
+
+        //Normalize image to unity
+        mat = mat / 255;
+
+        //Append "bias" row to input
+        mat.conservativeResize(mat.rows(), mat.cols()+1);
+        mat.col(mat.cols()-1) = Eigen::VectorXd::Ones(mat.rows());
+
         return mat;
     } else {
-        return MatrixXd::Zero(m_batchSize, 0);
+        return MatrixXd::Zero(batchSize, 0);
     }
 }
 
@@ -82,4 +92,8 @@ VectorXd BatchImageLoader::convertImageToVector(const cv::Mat& image) {
     int size = matrix.cols()*matrix.rows();
     VectorXd v(Map<VectorXd>(matrix.data(), size));
     return v;
+}
+
+bool BatchImageLoader::hasNext() {
+    return m_descriptor.hasNext();
 }

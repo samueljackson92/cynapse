@@ -10,26 +10,26 @@
 #include <boost/filesystem.hpp>
 #include <string>
 
+#include "BatchDatasetDescriptor.h"
+
 
 class BatchImageLoader
 {
-    public:
-        BatchImageLoader(const std::string& directory, const int batchSize, const std::string& extension = ".jpg");
-        Eigen::MatrixXd next();
-        std::vector<std::string> getFilenames() const { return m_filenames; }
+public:
+    BatchImageLoader(const std::string& directory, const int batchSize, const int numClasses);
+    void next();
+    bool hasNext();
+    Eigen::MatrixXd loadImages();
+    Eigen::MatrixXd loadLabels();
 
-    private:
-        void nextFilenameBatch();
-        std::vector<Eigen::VectorXd> loadImages(const std::vector<std::string>& filenames);
-        Eigen::MatrixXd stackVectorsRowwise(const std::vector<Eigen::VectorXd>& vectors);
-        Eigen::VectorXd loadImage(const std::string& path);
-        Eigen::VectorXd convertImageToVector(const cv::Mat& image);
+private:
+    Eigen::MatrixXd stackVectorsRowwise(const std::vector<Eigen::VectorXd>& vectors);
+    Eigen::VectorXd loadImage(const std::string& path);
+    Eigen::VectorXd convertImageToVector(const cv::Mat& image);
 
-        boost::filesystem::directory_iterator m_directoryIter;
-        boost::filesystem::directory_iterator m_endIter;
-        std::vector<std::string> m_filenames;
-        const std::string m_extension;
-        const int m_batchSize;
+    BatchDatasetDescriptor m_descriptor;
+    const std::string m_directory;
+    const int m_numClasses;
 };
 
 #endif

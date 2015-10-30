@@ -2,7 +2,7 @@
 // Created by Samuel Jackson on 29/10/15.
 //
 
-#include "DatasetDescriptor.h"
+#include "BatchDatasetDescriptor.h"
 
 #include <string>
 #include <fstream>
@@ -16,19 +16,19 @@
 using namespace std;
 using namespace boost;
 
-DatasetDescriptor::DatasetDescriptor(const string &filename, const int batchSize)
+BatchDatasetDescriptor::BatchDatasetDescriptor(const string &filename, const int batchSize)
         : m_batchSize(batchSize) {
 
     m_file = openFileStream(filename);
     skipHeader();
 }
 
-void DatasetDescriptor::next() {
+void BatchDatasetDescriptor::next() {
     resetBatch();
     readCSVFile();
 }
 
-void DatasetDescriptor::resetBatch() {
+void BatchDatasetDescriptor::resetBatch() {
     m_filenames.clear();
     m_filenames.reserve(m_batchSize);
 
@@ -36,13 +36,13 @@ void DatasetDescriptor::resetBatch() {
     m_labels.reserve(m_batchSize);
 }
 
-void DatasetDescriptor::readCSVFile() {
+void BatchDatasetDescriptor::readCSVFile() {
     for(int i=0; i < m_batchSize; ++i) {
         readCSVRow();
     }
 }
 
-void DatasetDescriptor::readCSVRow() {
+void BatchDatasetDescriptor::readCSVRow() {
     typedef tokenizer< escaped_list_separator<char> > Tokenizer;
     vector<string> vec;
     string line;
@@ -62,17 +62,21 @@ void DatasetDescriptor::readCSVRow() {
     m_filenames.push_back(vec[2]);
 }
 
-void DatasetDescriptor::skipHeader(const size_t skipLines) {
+void BatchDatasetDescriptor::skipHeader(const size_t skipLines) {
     for (size_t i = 0; i < skipLines; ++i) {
         m_file.ignore(numeric_limits<streamsize>::max(), '\n');
     }
 }
 
-std::ifstream DatasetDescriptor::openFileStream(const std::string &filename) {
+std::ifstream BatchDatasetDescriptor::openFileStream(const std::string &filename) {
     ifstream in(filename.c_str());
 
     if (!in.is_open()) {
         throw runtime_error("Could not open file: " + filename);
     }
     return in;
+}
+
+bool BatchDatasetDescriptor::hasNext() {
+    return (m_file && m_file.peek() != EOF);
 }
